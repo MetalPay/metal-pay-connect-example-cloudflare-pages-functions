@@ -58,7 +58,8 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const allowedOrigins = getAllowedOrigins(env);
-    const origin = url.origin;
+    // Try to use the "Origin" header if available; otherwise, use URL origin
+    const origin = request.headers.get("origin") || url.origin;
     console.log("Received request for URL:", url, "from origin:", origin);
 
     // Redirect all requests to /v1/signature if the path is different
@@ -100,7 +101,7 @@ export default {
 
 // CORS preflight handler for OPTIONS method
 function handleOptions(request, allowedOrigins) {
-  const origin = request.headers.get("Origin");
+  const origin = request.headers.get("origin");
   console.log("Handling OPTIONS request for origin:", origin);
 
   if (origin && !checkCors(origin, allowedOrigins)) {
